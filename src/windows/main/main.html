@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Жако</title>
+    <link rel="stylesheet" href="../../../photon/dist/css/photon.css">
+    <link rel="stylesheet" href="modalzinha.css">
+    <link rel="stylesheet" href="datepicker/css/bootstrap-datepicker3.standalone.min.css">
+    <script src="pdfmake.min.js"></script>
+    <script src='vfs_fonts.js'></script>
+</head>
+<body ng-controller="AppCtrl">
+<div class="window">
+      <header class="toolbar toolbar-header">
+       <h4 style="    margin: 0;padding: 0;float: left;margin-left: 10px;">Жако</h4>
+        <i class="icon icon-cancel pull-right" style="font-size: 16px;margin: 3px 10px;cursor: pointer;" id="close"></i>
+      </header>
+
+      <div class="window-content">
+        <div class="pane-group">
+          
+               <div class="pane pane-sm sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">Действия</h5>
+              <span class="nav-group-item">
+                <span class="icon icon-users"></span>
+                <a href="People.html">Просмотр персонала</a>
+              </span>
+              <span class="nav-group-item active">
+                <span class="icon icon-newspaper"></span>
+                <a href="main.html">Чек для клиента</a>
+              </span>
+            </nav>
+          </div>
+        <div class="pane">
+            <table class="table-striped">
+              <thead>
+                <tr>
+                  <th>Состояние</th>
+                  <th>Услуга</th>
+                  <th>Себестоимость</th>
+                  <th>Заработок за шт.</th>
+                  <th>Количество</th>
+                  <th>Всего</th>
+                  <th><span class="icon icon-trash"></span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="purchase in purchases track by purchase.cid">
+                  <td><input type="checkbox" ng-click="updateStatus(purchase.cid, value1)" ng-checked="purchase.val" ng-model="value1"></td>
+                  <td>{{purchase.Us}}</td>
+                  <td> {{purchase.Sb}} </td>
+                  <td> {{purchase.Zb}} </td>
+                  <td> {{purchase.Kl}} </td>
+                  <td> {{purchase.Al}} </td>
+                  <td ng-click="delPurchase(purchase.cid)" style="color: red;"><span class="icon icon-trash"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <div class="pane pane-sm sidebar pull-right">
+         <div class="form-group">
+          <input type="search" id="jetsSearch" class="form-control" placeholder="Поиск по дате">
+         </div>
+           <div style="overflow-y: auto; max-height: 311px;">
+               
+                <ul class="list-group" id="right-list">
+                  <li class="list-group-item" ng-repeat="service in services track by service.cid" ng-click="go(service.cid)" id="{{service.cid}}" style="z-index: 100; position: relative;">
+                   {{service.date}}
+                    <div class="media-body">
+                      <strong>Имя: </strong><span>{{service.name}}</span>
+                      <p><b>Возраст: </b>{{service.age}}</p>
+                    </div>
+                    <span style="background: url('x_button.png'); position: absolute;top: 7px;right: 7px;display: block;width: 20px;height: 20px;background-size: contain;cursor: pointer;" ng-click="delService(service.cid)"></span>
+                  </li>
+                </ul>
+            </div>
+           <hr>
+<!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close">×</button>
+                        <div class="text">
+                    <div class="media-body">
+                        <form class="padded-less">
+                           <div class="form-group">
+                               <input type="text" class="form-control" id="date" placeholder="Дата" style="color: #000;">
+                           </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control del" placeholder="Имя" ng-model="service.name" style="color: #000;">
+                            </div>
+                            <div class="form-group">
+                                <input type="number" min="0" max="151" class="form-control del" placeholder="Возраст" ng-model="service.age" style="color: #000;">
+                            </div>
+                        </form>
+                        <button class="btn btn-large btn-default" ng-click="newService(service.name, service.age)">Новый заказ</button>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+<!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper2">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close2">×</button>
+                        <div class="text">
+                            <form class="padded-less">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Товар" ng-model="product.what" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Себестоимость" ng-model="product.Sb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Заработок" ng-model="product.Zb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-form btn-default" ng-click="addProduct(product.what, product.Sb, product.Zb)">Новый товар</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+           <!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper3">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close3">×</button>
+                        <div class="text">
+                            <form class="padded-less">
+                               <div class="form-group">
+                               <label>Выберите услугу</label>
+                                <select class="form-control" ng-options="option.what for option in data.availableOptions track by option.cid" ng-model="data.selectedOption" style="color:#000;">
+                                </select>
+                               </div>
+                                <div class="form-group">
+                                   <label>Редактировать услугу</label>
+                                    <input type="text" placeholder="Товар" ng-model="data.selectedOption.what" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Себестоимость" ng-model="data.selectedOption.Sb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Заработок" ng-model="data.selectedOption.Zb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-form btn-default" ng-click="updateProduct(data.selectedOption.cid ,data.selectedOption.what, data.selectedOption.Sb, data.selectedOption.Zb)">Сохранить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+           <!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper4">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close4">×</button>
+                        <div class="text">
+                            <form class="padded-less">
+                               <div class="form-group">
+                               <label>Выберите заказ</label>
+                                <select class="form-control" ng-options="service.name for service in services track by service.cid" ng-model="selectedName" style="color:#000;">
+                                </select>
+                               </div>
+                           <div class="form-group">
+                               <input type="text" class="form-control" id="dateModal" placeholder="Дата" style="color: #000;" ng-model="selectedName.date">
+                           </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control del" placeholder="Имя" style="color: #000;" ng-model="selectedName.name">
+                            </div>
+                            <div class="form-group">
+                                <input type="number" min="0" max="151" class="form-control del" placeholder="Возраст" ng-model="selectedName.age" style="color: #000;">
+                            </div>
+                            </form>
+                            <button class="btn btn-form btn-default" ng-click="updateService(selectedName.cid, selectedName.name, selectedName.age)">Сохранить</button>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+            <form class="padded-less">
+               <div class="form-group">
+                <select class="form-control" ng-options="option.what for option in data.availableOptions track by option.cid"
+      ng-model="data.selectedOption">
+                </select>
+               </div>
+                <div class="form-group">
+                  <input type="number" min="1" class="form-control" placeholder="Количество" name="userName" id="Kl">
+                </div>
+                <div class="form-actions">
+                  <button class="btn btn-form btn-primary" ng-click="addPurchase(data.selectedOption)">Добавить</button>
+                </div>
+            </form>
+            <hr>
+            <div class="form-group">
+                               <input type="text" class="form-control" id="dateStarting" placeholder="Начало промежутка" style="color: #000;">
+            </div>
+            <div class="form-group">
+                               <input type="text" class="form-control" id="dateEnding" placeholder="Конец промежутка" style="color: #000;">
+            </div>
+            <button class="btn btn-form btn-primary" ng-click="compareDate()" data-modal="open14">Узнать доход <br> за промежуток времени</button>
+        </div>
+        
+        
+        <!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper14">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close14">×</button>
+                        <div class="text">
+                    <div class="media-body">
+                        <span>С {{ date.start }} по {{ date.end }} доход составляет: {{income}}</span><br>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+
+
+                </div>
+
+      </div><!-- window content -->
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions pull-left">
+        <div>
+            <span><b>Общая себестоимость: </b></span>
+            <span ng-bind="res.Sb">392</span>
+        </div>
+        <div>
+            <span><b>Общий заработок: </b></span>
+            <span ng-bind="res.Zb">3912</span>
+        </div>
+        <div>
+            <span><b>всего: </b></span>
+            <span ng-bind="res.Al">32192</span>
+        </div>
+        </div>
+        <div class="toolbar-actions pull-right">
+            <button class="clipboard btn btn-large btn-default" data-clipboard-text="{{copy}}" ng-click="cb()">Скопировать</button>
+        </div>
+        <div class="toolbar-actions pull-right">
+               <button class="btn btn-large btn-default" ng-click="cbp()">Печатать</button>
+        </div>        
+        <div class="toolbar-actions pull-right">
+            <button data-modal="open" class="btn btn-large btn-default">Добавить заказ</button>
+        </div>
+        <div class="toolbar-actions pull-right">
+            <button data-modal="open4" class="btn btn-large btn-default">Редактировать заказ</button>
+        </div>
+        <div class="toolbar-actions pull-right">
+            <button data-modal="open2" class="btn btn-large btn-default">Добавить товар</button>
+        </div>
+        <div class="toolbar-actions pull-right">
+            <button data-modal="open3" class="btn btn-large btn-default">Изменить товар</button>
+        </div>
+      </footer>
+    </div>
+    <script>
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular.min.js"></script>
+    <script src="main.js"></script>
+    <script src="modalzinha.js"></script>
+    <script src="mod2.js"></script>
+    <script src="datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="datepicker/locales/bootstrap-datepicker.ru.min.js"></script>
+    <script>
+    jQuery('#date').datepicker({
+        language: "ru",
+        format: 'yyyy/mm/dd'
+    });
+jQuery('#dateModal').datepicker({
+        language: "ru",
+        format: 'yyyy/mm/dd'
+    });
+jQuery('#dateStarting').datepicker({
+        language: "ru",
+        zIndexOffset: 1000,
+        format: 'yyyy/mm/dd'
+    });
+jQuery('#dateEnding').datepicker({
+        language: "ru",
+        zIndexOffset: 1000,
+        format: 'yyyy/mm/dd'
+});
+var Jets = require('jets');
+var jets = new Jets({
+            searchTag: '#jetsSearch',
+            contentTag: '#right-list'
+        });
+
+        jQuery('#close').click(function() {
+            ipc.send('exit');
+        });
+    </script>
+</body>
+</html>

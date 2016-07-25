@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <title>Жако</title>
+    <link rel="stylesheet" href="../../../photon/dist/css/photon.css">
+    <link rel="stylesheet" href="datepicker/css/bootstrap-datepicker3.standalone.min.css">
+    <link rel="stylesheet" href="modalzinha.css">
+</head>
+<body ng-controller="AppCtrl">
+<div class="window">
+      <header class="toolbar toolbar-header">
+       <h4 style="    margin: 0;padding: 0;float: left;margin-left: 10px;">Жако</h4>
+        <i class="icon icon-cancel pull-right" style="font-size: 16px;margin: 3px 10px;cursor: pointer;" id="close"></i>
+      </header>
+
+      <div class="window-content">
+        <div class="pane-group">
+          
+               <div class="pane pane-sm sidebar">
+            <nav class="nav-group">
+              <h5 class="nav-group-title">Действия</h5>
+              <span class="nav-group-item active">
+                <span class="icon icon-users"></span>
+                <a href="People.html">Просмотр Персонала</a>
+              </span>
+              <span class="nav-group-item">
+                <span class="icon icon-newspaper"></span>
+                <a href="main.html">Чек для клиента</a>
+              </span>
+            </nav>
+          </div>
+        <div class="pane">
+            <table class="table-striped">
+              <thead>
+                <tr>
+                    <th>Оплачено</th>
+                    <th>Дата</th>
+                    <th>Зарплата</th>
+                    <th>За что ?</th>
+                    <th><span class="icon icon-trash"></span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="pay in pays track by pay.cid">
+                    <td><input type="checkbox" ng-click="updateStatus(pay.cid, value1)" ng-checked="pay.val" ng-model="value1"></td>
+                   <td> {{pay.data}} </td>
+                    <td>{{pay.zp}}</td>
+                    <td>{{pay.what}}</td>
+                    <td ng-click="delPay(pay.cid)" style="color: red;"><span class="icon icon-trash"></span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <div class="pane pane-sm sidebar pull-right">
+          <div class="form-group">
+              <input type="search" class="form-control" id="jetsSearch" placeholder="Поиск по фамилии">
+          </div>
+           <div style="overflow-y: auto; max-height: 400px;">
+                <ul class="list-group" id="jetsContent">
+                  <li class="list-group-item doItActive" style="z-index: 100; color: transparent;" ng-click="activeWorker(worker.cid)" ng-repeat="worker in workers track by worker.cid"  id="{{worker.cid}}">{{worker.second | lowercase}}
+                       <div class="media-body" style="position: relative;">
+                        <span style="color: #414142"><b>Имя:</b> {{worker.name}}</span><br>
+                        <span style="color: #414142"><b>Фамилия:</b> {{worker.second}}</span><br>
+                        <span style="color: #414142"><b>Отчество:</b> {{worker.third}}</span><br>
+                        <span style="background: url('x_button.png'); position: absolute;top: 7px;right: 7px;display: block;width: 20px;height: 20px;background-size: contain;cursor: pointer;" ng-click="deleteWorker(worker.cid)"></span>
+                    </div>
+                  </li>
+                </ul>
+            </div>
+           <hr>
+            <form class="padded-less">
+              <div class="form-group">
+                  <input type="text" id="date" placeholder="Дата" class="form-control">
+              </div>
+               <div class="form-group">
+                    <input class="form-control" type="number" min="0" placeholder="Зарплата" ng-model="pay.zp">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" placeholder="За что ?" ng-model="pay.what">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-large btn-primary" ng-click="addPay(pay.zp, pay.what)">Добавить</button>
+                </div>
+            </form>
+<!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close">×</button>
+                        <div class="text">
+                    <div class="media-body">
+                        <form class="padded-less">
+                            <div class="form-group">
+                                <input type="text" class="form-control delWorker" placeholder="Имя" ng-model="worker.name" style="color: #000;">
+                            </div>
+                             <div class="form-group">
+                                <input type="text" class="form-control delWorker" placeholder="Фамилия" ng-model="worker.second" style="color: #000;">
+                            </div>
+                             <div class="form-group">
+                                <input type="text" class="form-control delWorker" placeholder="Отчество" ng-model="worker.third" style="color: #000;">
+                            </div>
+                        </form>
+                        <button class="btn btn-large btn-default" ng-click="newWorker(worker.name, worker.second, worker.third)">Добавить сотрудника</button>
+                    </div>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+<!--  start modal -->
+            <div class="modal-wrapper" data-modal="wrapper2">
+              <div class="modal-content">
+                         <button class="fechar-modal" data-modal="close2">×</button>
+                        <div class="text">
+                            <form class="padded-less">
+                                <div class="form-group">
+                                    <input type="text" placeholder="Товар" ng-model="product.what" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Себестоимость" ng-model="product.Sb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" min="0" placeholder="Заработок" ng-model="product.Zb" class="form-control" style="color: #000;">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-form btn-default" ng-click="addProduct(product.what, product.Sb, product.Zb)">Новый товар</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+<!--   end modal         -->  
+        </div>
+        
+
+
+                </div>
+
+      </div><!-- window content -->
+      <footer class="toolbar toolbar-footer">
+        <div class="toolbar-actions pull-left">
+        <div>
+            <span><b>Всего оплачено: </b></span>
+            <span ng-bind="op"></span>
+        </div>
+        <div>
+            <span><b>Всего не оплачено: </b></span>
+            <span ng-bind="np"></span>
+        </div>
+        <div>
+            <span><b>всего: </b></span>
+            <span ng-bind="al"></span>
+        </div>
+        </div>
+        <div class="toolbar-actions pull-right">
+            <button data-modal="open" class="btn btn-large btn-default">Добавить работника</button>
+        </div>
+      </footer>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0-beta.2/angular.min.js"></script>
+    <script src="people.js"></script>
+    <script src="modalzinha.js"></script>
+        <script src="datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script src="datepicker/locales/bootstrap-datepicker.ru.min.js"></script>
+    <script>
+    jQuery('#date').datepicker({
+        language: "ru"
+    });
+    var Jets = require('jets');
+var jets = new Jets({
+  searchTag: '#jetsSearch',
+  contentTag: '#jetsContent'
+});
+     jQuery('#close').click(function() {
+            ipc.send('exit');
+        });</script>
+</body>
+</html>

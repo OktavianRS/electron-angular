@@ -1,0 +1,44 @@
+<html ng-app="myApp">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../photon/dist/css/photon.css">
+</head>
+<body>
+<div class="pane-group">
+<div class="pane ">
+            <form class="padded-less" ng-controller="AppCtrl">
+        <table class="table-striped">
+  <thead>
+        <tr>
+            <th>Номер группы</th>
+            <th>&nbsp;</th>
+        </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="group in groupList">
+        <td>{{group.name}}</td>
+        <td>      
+        <button class="btn btn-default pull-right" ng-click="remove(group.id)">
+              <span class="icon icon-trash"></span>
+        </button>
+        <button class="btn btn-default pull-right"  id="addSubject">
+              <span class="icon icon-cog"></span>
+        </button>
+        </td>
+    </tr>
+    <tr>
+        <td>   <input type="text" class="form-control" placeholder="Номер группы" ng-model="group.name">
+</td>
+        <td>   <button class="btn btn-primary pull-right" ng-click="addGroup()">Добавить группу</button></td>
+    </tr>
+  </tbody>
+</table>
+
+    </form>
+    </div>
+    </div>
+    <script>require('../../Controllers/controller.js');
+    
+    </script>
+</body>
+</html>
